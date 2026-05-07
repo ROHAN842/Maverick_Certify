@@ -1,0 +1,95 @@
+Build a clean, professional React frontend for a web application called 
+“Maverick Certify – Certification Management Platform”.
+
+The application should support the following screens and behavior:
+
+**<strong>1. Authentication & Role Handling</strong>
+<strong>- Simple login screen</strong>
+<strong>- Roles: Admin, Certification Coordinator</strong>
+<strong>- Role-based navigation visibility**</strong>
+
+2. Dashboard (Main Screen)
+- Show summary cards:
+  - Total certificates generated
+  - Emails sent
+  - LinkedIn posts completed
+  - Pending actions
+- Show recent certification batches
+- Color-coded status indicators
+
+3. Certification Batch Management
+- Create batch form:
+  - Event/Training Name
+  - Batch ID
+  - Event Date
+
+**<strong>- Display batch lifecycle:</strong>
+<strong>  - Draft</strong>
+<strong>  - Certificates Generated</strong>
+<strong>  - Emails Sent</strong>
+<strong>  - Completed</strong>
+<strong>- Disable invalid actions based on status</strong>
+
+<strong>4. Candidate Excel Upload</strong>
+<strong>- Upload Excel file</strong>
+<strong>- Show validation results:</strong>
+<strong>  - Missing fields</strong>
+<strong>  - Duplicate emails</strong>
+<strong>  - Invalid email formats</strong>
+<strong>- Prevent submission until errors are resolved</strong>
+
+<strong>5. Certificate Template Management</strong>
+<strong>- Upload or create certificate template</strong>
+<strong>- Configure placeholders:</strong>
+<strong>  - Candidate Name</strong>
+<strong>  - Event Name</strong>
+<strong>  - Date</strong>
+<strong>  - Signatory Name</strong>
+<strong>  - Signature Image</strong>
+<strong>  - Logo</strong>
+<strong>  - QR Code</strong>
+<strong>- Preview template before saving</strong>
+<strong>- Reuse templates across batches</strong>
+
+<strong>6. Certificate Generation Screen</strong>
+<strong>- Button to generate certificates</strong>
+<strong>- Progress indicator</strong>
+<strong>- Show success/failure count</strong>
+<strong>- Confirmation dialog before re-generation**</strong>
+
+7. Email Distribution Screen
+- Customize email subject and body
+- Send bulk emails
+**<strong>- Show email status per candidate:</strong>
+<strong>  - Grey: Not Sent</strong>
+<strong>  - Blue: Sent</strong>
+<strong>  - Green: Delivered / Opened**</strong>
+
+8. LinkedIn Tracking Screen
+- Show list of candidates with LinkedIn status
+- Allow manual LinkedIn post URL submission
+**<strong>- Status colors:</strong>
+<strong>  - Red: Not Posted</strong>
+<strong>  - Orange: Reminder Sent</strong>
+<strong>  - Green: Posted</strong>
+<strong>- Show reminder history</strong>
+
+<strong>9. Reports & Downloads</strong>
+<strong>- Batch-wise reports</strong>
+<strong>- Email delivery report</strong>
+<strong>- LinkedIn compliance report</strong>
+<strong>- Export as Excel or PDF</strong>
+
+<strong>10. Admin Screens</strong>
+<strong>- Audit log viewer</strong>
+<strong>- System configuration (email settings)</strong>
+<strong>- User management</strong>
+
+<strong>UI Guidelines:</strong>
+<strong>- Clean, modern layout</strong>
+<strong>- Use cards, tables, progress bars, and icons</strong>
+<strong>- Responsive design</strong>
+<strong>- Clear visual feedback for actions and errors</strong>
+<strong>- No payment integrations**</strong>
+
+The frontend should be API-driven and ready to connect to a FastAPI backend.
