@@ -1,0 +1,84 @@
+Great question — and an important one for production RAG systems. Let me give you a proper, logical, deterministic approach.
+
+The Core Problem First
+
+In your pipeline, accuracy measurement has two distinct layers that most people confuse:
+
+Layer	Question	Method
+Retrieval accuracy	Did semantic search fetch the right chunks?	Chunk relevance scoring
+Extraction accuracy	Did the LLM extract the correct value from those chunks?	Value comparison against ground truth
+
+You need both. A high retrieval score with low extraction score means your prompt is weak. A low retrieval score with high extraction score means you got lucky with overlapping chunks.
+
+The Only Truly Deterministic Approach — Ground Truth Evaluation
+
+This is the industry standard and the only logically sound method.
+
+Step 1 — Build a Ground Truth Dataset
+
+Manually extract the correct values from your PDF documents yourself (or have a domain expert do it). Store these as a JSON file — call it your golden dataset:
+
+json
+{
+  "reference_id": "REF_001",
+  "document_type": "SOV_Document",
+  "ground_truth": {
+    "Named Insured": "Azul Biscayne Resort & Spa, LLC",
+    "Policy Period": "April 1, 2026 - April 1, 2027",
+    "Construction Type": {
+      "LOC 001": "Fire Resistive - ISO Class 6",
+      "LOC 002": "Fire Resistive - ISO Class 6",
+      "LOC 003": "Non-Combustible - Light Steel Frame",
+      "LOC 004": "Non-Combustible - Light Steel Frame"
+    },
+    "Grand Total TIV": "$200,350,000"
+  }
+}
+
+This is your single source of truth. Without this, no accuracy calculation is meaningful.
+
+Step 2 — Attribute-Level Scoring Logic
+
+For each attribute, apply this scoring logic deterministically:
+
+Single-value attribute:
+  Exact match          → score = 1.0
+  Normalized match*    → score = 0.9
+  Partial match**      → score = 0.5
+  Not Found / null     → score = 0.0
+  Wrong value          → score = 0.0
+
+Multi-location attribute (dict):
+  score = average of per-location scores
+  Each location scored same as single-value above
+  Missing location key → score = 0.0 for that location
+
+* Normalized match = same value after stripping $, ,, extra spaces, case differences. "$128,500,000" vs "128500000" should be treated as the same.
+
+** Partial match = extracted value contains the ground truth or vice versa. Example: ground truth is "NFPA 13 Wet Pipe", extracted is "NFPA 13 Wet Pipe — 100% Coverage" — this is a partial match, not a failure.
+
+Step 3 — Document-Level Metrics
+
+From attribute scores, compute these three metrics per document run:
+
+Exact Match Rate    = (attributes with score 1.0) / total attributes
+Weighted Score      = sum of all attribute scores / total attributes  
+Not Found Rate      = (attributes returning null or "Not Found") / total attributes
+
+These three together tell you the full story:
+
+High Exact Match + Low Not Found = working well
+High Not Found = retrieval problem (wrong chunks being fetched)
+Low Exact Match + Low Not Found = extraction problem (chunks found but LLM extracting wrong value)
+
+Step 4 — Determinism Testing
+
+Run the same document 5 times with temperature=0 (which you already have in your retriever). Compare the 5 output JSONs. If any attribute value differs across runs — that is a hallucination signal, not a retrieval problem. Track this as:
+
+Consistency Score = (attributes with identical value across all N runs) / total attributes
+
+With temperature=0 and top_p=1 your system should give 100% consistency. If it doesn’t, the cause is almost always chunking non-determinism (chunk boundary shifts) not the LLM itself.
+
+Putting It All Together — The Evaluation Framework
+
+Here is the complete flow I would recommend you build:
